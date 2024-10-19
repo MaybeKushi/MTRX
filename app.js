@@ -36,7 +36,7 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
 
         const inlineKeyboard = {
             inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?invitedBy=${inviterName}` } }],
+                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?invitedBy=${inviterName}&userId=${msg.from.user_id}` } }],
                 [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
             ]
         };
