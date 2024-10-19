@@ -2,7 +2,7 @@ import string
 import random
 import sqlite3
 
-conn = sqlite3.connect("referrals.db")
+conn = sqlite3.connect("referrals.db", check_same_thread=False)
 cursor = conn.cursor()
 
 MATRIX_START_TEXT = """
@@ -24,6 +24,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS referrals (
 def save_referral(user_id, invite_code, invited_by=None):
     cursor.execute("INSERT OR REPLACE INTO referrals (user_id, invite_code, invited_by) VALUES (?, ?, ?)", (user_id, invite_code, invited_by))
     conn.commit()
+    conn.close()
 
 async def get_user_id_by_invite_code(invite_code):
     cursor.execute("SELECT user_id FROM referrals WHERE invite_code = ?", (invite_code,))
