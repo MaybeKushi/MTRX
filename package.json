@@ -1,5 +1,5 @@
 {
-  "name": "MATRIX_AI_BOT",
+  "name": "matrixai",
   "version": "1.0.0",
   "description": "A Telegram Bot Built Using Node.js",
   "main": "app.js",
