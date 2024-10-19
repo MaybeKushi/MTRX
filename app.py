@@ -45,7 +45,7 @@ from flask import jsonify
 app = Flask(__name__)
 
 @app.route('/link', methods=['GET'])
-def get_Referral_Link() -> None:
+def get_Referral_Link():
     users = request.args.get('user')
     if not users:
         return jsonify({"error": "User ID Is Required !"}), 400
