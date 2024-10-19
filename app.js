@@ -16,7 +16,7 @@ Take the first step and see just how you stack up!
 async function getUsername(userId) {
     try {
         const user = await bot.getChat(userId);
-        return user.username ? `@${user.username}` : user.first_name; // Return username or first name
+        return user.username ? `@${user.username}` : user.first_name;
     } catch (error) {
         console.error("Error fetching user:", error);
         return "Unknown"; 
