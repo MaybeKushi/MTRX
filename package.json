@@ -1,0 +1,16 @@
+{
+  "name": "MATRIX_AI_BOT",
+  "version": "1.0.0",
+  "description": "A Telegram Bot Built Using Node.js",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.56.0"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "license": "MIT"
+}
