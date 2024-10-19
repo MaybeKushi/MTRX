@@ -4,20 +4,12 @@
     {
       "src": "app.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "bot.py",
-      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/link",
+      "src": "/(.*)",
       "dest": "app.py"
-    },
-    {
-      "src": "/bot",
-      "dest": "bot.py"
     }
   ]
 }
