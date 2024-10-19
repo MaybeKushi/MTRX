@@ -1,0 +1,4 @@
+pyrogram
+Flask
+tgcrypto
+sqlite3
