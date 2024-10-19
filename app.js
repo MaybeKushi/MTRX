@@ -4,7 +4,7 @@ const AppToken = '7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA';
 const bot = new TelegramBot(AppToken, { polling: true });
 
 const MATRIX_START_TEXT = `
-Want to know how cool your Telegram presence is ? 
+Want to know how cool your Telegram presence is? 
 Check your profile rating and unlock awesome rewards with $MTRX Matrix AI!
 
 Time to vibe ✨ and step into the world of Web3.
@@ -16,10 +16,10 @@ Take the first step and see just how you stack up!
 async function getUsername(userId) {
     try {
         const user = await bot.getChat(userId);
-        return user.username ? `@${user.username}` : "Unknown";
+        return user.username ? `@${user.username}` : user.first_name; // Return username or first name
     } catch (error) {
         console.error("Error fetching user:", error);
-        return "Unknown";
+        return "Unknown"; 
     }
 }
 
