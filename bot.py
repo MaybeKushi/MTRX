@@ -28,7 +28,7 @@ async def startFuncs(app2:Client, message:Message) -> None:
                 MessageText = f"{MATRIX_START_TEXT}\n\nInvited by: {inviter_name}"
                 await message.reply_photo(
                     photo="https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg",
-                    text=MessageText,
+                    caption=MessageText,
                     reply_markup=InlineKeyboard
                 )
                 await app2.send_message(inviter_id, f"{msg.from_user.mention} Joined via your invited link !")
@@ -39,7 +39,7 @@ async def startFuncs(app2:Client, message:Message) -> None:
         ])
         await message.reply_photo(
             photo="https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg",
-            text=MATRIX_START_TEXT,
+            caption=MATRIX_START_TEXT,
             reply_markup=InlineKeyboard
         )
 
