@@ -32,7 +32,7 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
         const inviterId = commandArgs.split('ref_')[1];
         const inviterName = await getUsername(inviterId);
 
-        const messageText = `${MATRIX_START_TEXT}\n\nInvited by: ${inviterName}`;
+        const messageText = `${MATRIX_START_TEXT}\nInvited by: ${inviterName}`;
 
         const inlineKeyboard = {
             inline_keyboard: [
