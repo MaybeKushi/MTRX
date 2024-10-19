@@ -9,20 +9,7 @@ from pyrogram.types import WebAppInfo, InlineKeyboardMarkup, InlineKeyboardButto
 conn = sqlite3.connect("referrals.db")
 cursor = conn.cursor()
 
-
-START_TEXT_INVITED_BY = """
-Want to know how cool your Telegram presence is ? 
-Check your profile rating and unlock awesome rewards with $MTRX Matrix AI !
-
-Time to vibe ✨ and step into the world of Web3.
-$MTRX is on the way... Ready to explore something new ?
-
-Take the first step and see just how you stack up !
-
-Invited By : {invitedBy}
-"""
-
-NORMAL_START_TEXT = """
+MATRIX_START_TEXT = """
 Want to know how cool your Telegram presence is ? 
 Check your profile rating and unlock awesome rewards with $MTRX Matrix AI !
 
@@ -32,24 +19,6 @@ $MTRX is on the way... Ready to explore something new ?
 Take the first step and see just how you stack up !
 """
 
-
-
-
-
-
-
-
-import sqlite3
-import random
-import string
-from pyrogram import Client, filters
-from pyrogram.types import Message
-
-# Initialize SQLite connection
-conn = sqlite3.connect("referrals.db")
-cursor = conn.cursor()
-
-# Create table if it doesn't exist
 cursor.execute('''CREATE TABLE IF NOT EXISTS referrals (
     user_id INTEGER PRIMARY KEY,
     invite_code TEXT,
@@ -64,10 +33,6 @@ async def get_user_id_by_invite_code(invite_code):
     cursor.execute("SELECT user_id FROM referrals WHERE invite_code = ?", (invite_code,))
     result = cursor.fetchone()
     return result[0] if result else None
-
-# Initialize the Telegram Bot
-app = Client("my_bot", api_id="YOUR_API_ID", api_hash="YOUR_API_HASH", bot_token="YOUR_BOT_TOKEN")
-
 
 async def generate_invite_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -88,18 +53,27 @@ async def startFuncs(app:Client, message:Message) -> None:
             if inviter_id:
                 await save_referral(user_id, None, inviter_id)
                 inviter_name = await get_username(app, inviter_id)
-                keyboard = InlineKeyboardMarkup([
+                InlineKeyboard = InlineKeyboardMarkup([
                     [InlineKeyboardButton("Play Now 🪂", web_app=WebAppInfo(url=f"https://mtx-ai-bot.vercel.app/invited?id={user_id}&by={inviter_id}"))],
                     [InlineKeyboardButton("Join Community 🔥", url="https://telegram.me/MatrixAi_Ann")]
                 ])
+                MessageText = f"{MATRIX_START_TEXT}\n\nInvited by: {inviter_name}"
                 await message.reply_photo(
                     photo="https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg",
-                    text=START_TEXT_INVITED_BY.format(invitedBy=inviter_name),
-                    reply_markup=keyboard
+                    text=MessageText,
+                    reply_markup=InlineKeyboard
                 )
                 await app.send_message(inviter_id, f"{msg.from_user.mention} Joined via your invited link !")
     else:
-        await message.reply_photo()
+        InlineKeyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("Play Now 🪂", web_app=WebAppInfo(url=f"https://mtx-ai-bot.vercel.app"))],
+            [InlineKeyboardButton("Join Community 🔥", url="https://telegram.me/MatrixAi_Ann")]
+        ])
+        await message.reply_photo(
+            photo="https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg",
+            text=MATRIX_START_TEXT,
+            reply_markup=InlineKeyboard
+        )
 
 
       
