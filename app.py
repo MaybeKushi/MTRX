@@ -1,10 +1,6 @@
 import string
 import random
 import sqlite3
-from pyrogram import filters
-from pyrogram.client import Client
-from pyrogram.types import Message
-from pyrogram.types import WebAppInfo, InlineKeyboardMarkup, InlineKeyboardButton
 
 conn = sqlite3.connect("referrals.db")
 cursor = conn.cursor()
@@ -40,46 +36,12 @@ def generate_invite_code():
 async def get_username(app, userId):
     user = await app.get_users(userId)
     return user.mention if user.mention else "Unknown"
-    
-@app.on_message(filters.command("start"))
-async def startFuncs(app:Client, message:Message) -> None:
-    user_id = message.from_user.id
-    if len(message.command) > 1:
-        start_param = message.command[1]
-        if start_param.startswith("user_"):
-            invite_code = start_param.split('user_')[-1]
-            inviter_id = await get_user_id_by_invite_code(invite_code)
-            
-            if inviter_id:
-                save_referral(user_id, None, inviter_id)
-                inviter_name = await get_username(app, inviter_id)
-                InlineKeyboard = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("Play Now 🪂", web_app=WebAppInfo(url=f"https://mtx-ai-bot.vercel.app/invited?id={user_id}&by={inviter_id}"))],
-                    [InlineKeyboardButton("Join Community 🔥", url="https://telegram.me/MatrixAi_Ann")]
-                ])
-                MessageText = f"{MATRIX_START_TEXT}\n\nInvited by: {inviter_name}"
-                await message.reply_photo(
-                    photo="https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg",
-                    text=MessageText,
-                    reply_markup=InlineKeyboard
-                )
-                await app.send_message(inviter_id, f"{msg.from_user.mention} Joined via your invited link !")
-    else:
-        InlineKeyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("Play Now 🪂", web_app=WebAppInfo(url=f"https://mtx-ai-bot.vercel.app"))],
-            [InlineKeyboardButton("Join Community 🔥", url="https://telegram.me/MatrixAi_Ann")]
-        ])
-        await message.reply_photo(
-            photo="https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg",
-            text=MATRIX_START_TEXT,
-            reply_markup=InlineKeyboard
-        )
 
 from flask import Flask
 from flask import request
 from flask import jsonify
 
-app2 = Flask(__name__)
+app = Flask(__name__)
 
 @app.route('/link', methods=['GET'])
 def get_Referral_Link() -> None:
@@ -92,10 +54,5 @@ def get_Referral_Link() -> None:
     Referral_Link = f"https://telegram.me/MTRXAi_Bot?start=user_{Invite_Code}"
     return jsonify({"message": Referral_Link})
 
-
-
-
-
-
-
-app.run()
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
