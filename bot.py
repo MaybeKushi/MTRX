@@ -7,10 +7,10 @@ from pyrogram.types import WebAppInfo, InlineKeyboardMarkup, InlineKeyboardButto
 AppId = 29400566
 AppHash = "8fd30dc496aea7c14cf675f59b74ec6f"
 AppToken = "7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA"
-app = Client("MATRIX_AI", api_id=AppId, api_hash=AppHash, bot_token=AppToken)
+app2 = Client("MATRIX_AI", api_id=AppId, api_hash=AppHash, bot_token=AppToken)
 
-@app.on_message(filters.command("start"))
-async def startFuncs(app:Client, message:Message) -> None:
+@app2.on_message(filters.command("start"))
+async def startFuncs(app2:Client, message:Message) -> None:
     user_id = message.from_user.id
     if len(message.command) > 1:
         start_param = message.command[1]
@@ -20,7 +20,7 @@ async def startFuncs(app:Client, message:Message) -> None:
             
             if inviter_id:
                 save_referral(user_id, None, inviter_id)
-                inviter_name = await get_username(app, inviter_id)
+                inviter_name = await get_username(app2, inviter_id)
                 InlineKeyboard = InlineKeyboardMarkup([
                     [InlineKeyboardButton("Play Now 🪂", web_app=WebAppInfo(url=f"https://mtx-ai-bot.vercel.app/invited?id={user_id}&by={inviter_id}"))],
                     [InlineKeyboardButton("Join Community 🔥", url="https://telegram.me/MatrixAi_Ann")]
@@ -31,7 +31,7 @@ async def startFuncs(app:Client, message:Message) -> None:
                     text=MessageText,
                     reply_markup=InlineKeyboard
                 )
-                await app.send_message(inviter_id, f"{msg.from_user.mention} Joined via your invited link !")
+                await app2.send_message(inviter_id, f"{msg.from_user.mention} Joined via your invited link !")
     else:
         InlineKeyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("Play Now 🪂", web_app=WebAppInfo(url=f"https://mtx-ai-bot.vercel.app"))],
@@ -42,3 +42,5 @@ async def startFuncs(app:Client, message:Message) -> None:
             text=MATRIX_START_TEXT,
             reply_markup=InlineKeyboard
         )
+
+app2.run()
