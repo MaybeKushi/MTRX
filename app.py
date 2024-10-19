@@ -25,7 +25,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS referrals (
     invited_by INTEGER
 )''')
 
-async def save_referral(user_id, invite_code, invited_by=None):
+def save_referral(user_id, invite_code, invited_by=None):
     cursor.execute("INSERT OR REPLACE INTO referrals (user_id, invite_code, invited_by) VALUES (?, ?, ?)", (user_id, invite_code, invited_by))
     conn.commit()
 
@@ -34,7 +34,7 @@ async def get_user_id_by_invite_code(invite_code):
     result = cursor.fetchone()
     return result[0] if result else None
 
-async def generate_invite_code():
+def generate_invite_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 async def get_username(app, userId):
@@ -51,7 +51,7 @@ async def startFuncs(app:Client, message:Message) -> None:
             inviter_id = await get_user_id_by_invite_code(invite_code)
             
             if inviter_id:
-                await save_referral(user_id, None, inviter_id)
+                save_referral(user_id, None, inviter_id)
                 inviter_name = await get_username(app, inviter_id)
                 InlineKeyboard = InlineKeyboardMarkup([
                     [InlineKeyboardButton("Play Now 🪂", web_app=WebAppInfo(url=f"https://mtx-ai-bot.vercel.app/invited?id={user_id}&by={inviter_id}"))],
@@ -75,14 +75,27 @@ async def startFuncs(app:Client, message:Message) -> None:
             reply_markup=InlineKeyboard
         )
 
+from flask import Flask
+from flask import request
+from flask import jsonify
 
-      
-        
-        await message.reply(f"Welcome! Share your invite link: https://telegram.me/YOUR_BOT_USERNAME?start=invitedBy_{invite_code}")
+app2 = Flask(__name__)
+
+@app.route('/link', methods=['GET'])
+def get_Referral_Link() -> None:
+    users = request.args.get('user')
+    if not users:
+        return jsonify({"error": "User ID Is Required !"}), 400
+    
+    Invite_Code = generate_invite_code()
+    save_referral(users, Invite_Code)
+    Referral_Link = f"https://telegram.me/MTRXAi_Bot?start=user_{Invite_Code}"
+    return jsonify({"message": Referral_Link})
 
 
 
-invite_code = generate_invite_code()
-        save_referral(user_id, invite_code)
+
+
+
 
 app.run()
