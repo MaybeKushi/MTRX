@@ -50,11 +50,17 @@ bot.command('exec', async (ctx) => {
             response = 'No output from command';
         }
 
-        bot.telegram.editMessageText(response, {
-            chat_id: chatId,
-            message_id: processingMessage.message_id,
-            parse_mode: 'HTML'
-        });
+        if (processingMessage && processingMessage.message_id) {
+            try {
+                bot.telegram.editMessageText(chatId, processingMessage.message_id, null, response, {
+                    parse_mode: 'HTML'
+                });
+            } catch (editError) {
+                ctx.reply(`Failed to edit message: ${editError.message}`);
+            }
+        } else {
+            ctx.reply('Could not process your command.');
+        }
     });
 });
 
