@@ -26,6 +26,7 @@ async function getUsername(userId) {
 bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
+    const userNames = msg.from.username;
     const commandArgs = match[2];
 
     if (commandArgs && commandArgs.startsWith('ref_')) {
@@ -36,7 +37,7 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
 
         const inlineKeyboard = {
             inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?invitedBy=${inviterName}&userId=${msg.from.user_id}` } }],
+                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?username=${userNames}&userId=${userId}&invitedBy=${inviterName}&inviterId=${inviterId}` } }],
                 [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
             ]
         };
@@ -46,11 +47,11 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
             reply_markup: inlineKeyboard
         });
 
-        await bot.sendMessage(inviterId, `${msg.from.username || msg.from.first_name} joined via your invite link!`);
+        await bot.sendMessage(inviterId, `${msg.from.username || msg.from.first_name} Joined via your invite link !`);
     } else {
         const inlineKeyboard = {
             inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app` } }],
+                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?username=${userNames}&userId=${userId}` } }],
                 [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
             ]
         };
