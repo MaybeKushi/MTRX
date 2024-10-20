@@ -24,16 +24,6 @@ async function getUsername(userId) {
     }
 }
 
-async function usernameFuncs(userId) {
-    try {
-        const user = await bot.getChat(userId);
-        return user.username ? `${user.username}` : user.first_name;
-    } catch (error) {
-        console.error("Error fetching user:", error);
-        return "Unknown"; 
-    }
-}
-
 bot.onText(/\/exec (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
@@ -71,7 +61,6 @@ bot.onText(/\/exec (.+)/, async (msg, match) => {
 bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
-    const userNames = msg.from.username;
     const commandArgs = match[2];
 
     if (commandArgs && commandArgs.startsWith('ref_')) {
@@ -79,10 +68,9 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
         const inviterName = await getUsername(inviterId);
 
         const messageText = `${MATRIX_START_TEXT}\nInvited by: ${inviterName}`;
-        const userInviter = await usernameFuncs(inviterId);
         const inlineKeyboard = {
             inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?username=${userNames}&userId=${userId}&invitedBy=${userInviter}&inviterId=${inviterId}` } }],
+                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?userId=${userId}&inviterId=${inviterId}` } }],
                 [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
             ]
         };
@@ -96,7 +84,7 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
     } else {
         const inlineKeyboard = {
             inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?username=${userNames}&userId=${userId}` } }],
+                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?userId=${userId}` } }],
                 [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
             ]
         };
