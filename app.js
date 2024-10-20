@@ -113,12 +113,12 @@ bot.command('referrals', async (ctx) => {
 });
 
 bot.command('id', async (ctx) => {
-    const userId = ctx.from.id;
-
     if (ctx.reply_to_message) {
         const repliedUserId = ctx.reply_to_message.from.id;
-        await ctx.reply(`${ctx.reply_to_message.from.first_name}'s ID: ${repliedUserId}`);
+        const repliedUserName = ctx.reply_to_message.from.first_name || "User";
+        await ctx.reply(`${repliedUserName}'s ID: ${repliedUserId}`);
     } else {
+        const userId = ctx.from.id;
         await ctx.reply(`${ctx.from.first_name}'s ID: ${userId}`);
     }
 });
