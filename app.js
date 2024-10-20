@@ -19,7 +19,6 @@ async function getUsername(userId) {
         const user = await bot.telegram.getChat(userId);
         return user.username ? `@${user.username}` : user.first_name;
     } catch (error) {
-        console.error("Error fetching user:", error);
         return "Unknown"; 
     }
 }
@@ -28,6 +27,11 @@ bot.command('exec', async (ctx) => {
     const chatId = ctx.chat.id;
     const userId = ctx.from.id;
     const command = ctx.message.text.split(' ').slice(1).join(' ');
+
+    if (!command) {
+        await ctx.reply('No input found!');
+        return;
+    }
 
     const processingMessage = await ctx.reply('`Processing...`', { parse_mode: 'Markdown' });
 
@@ -113,9 +117,9 @@ bot.command('id', async (ctx) => {
 
     if (ctx.reply_to_message) {
         const repliedUserId = ctx.reply_to_message.from.id;
-        await ctx.reply(`${ctx.reply_to_message.from.first_name}'s ID : ${repliedUserId}`);
+        await ctx.reply(`${ctx.reply_to_message.from.first_name}'s ID: ${repliedUserId}`);
     } else {
-        await ctx.reply(`${ctx.from.first_name}'s ID : ${userId}`);
+        await ctx.reply(`${ctx.from.first_name}'s ID: ${userId}`);
     }
 });
 
