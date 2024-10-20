@@ -24,6 +24,16 @@ async function getUsername(userId) {
     }
 }
 
+async function usernameFuncs(userId) {
+    try {
+        const user = await bot.getChat(userId);
+        return user.username ? `${user.username}` : user.first_name;
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        return "Unknown"; 
+    }
+}
+
 bot.onText(/\/exec (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
@@ -69,10 +79,10 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
         const inviterName = await getUsername(inviterId);
 
         const messageText = `${MATRIX_START_TEXT}\nInvited by: ${inviterName}`;
-
+        const userInviter = await usernameFuncs(inviterId);
         const inlineKeyboard = {
             inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?username=${userNames}&userId=${userId}&invitedBy=${inviterName}&inviterId=${inviterId}` } }],
+                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?username=${userNames}&userId=${userId}&invitedBy=${userInviter}&inviterId=${inviterId}` } }],
                 [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
             ]
         };
