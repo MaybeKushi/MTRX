@@ -98,7 +98,7 @@ bot.command('start', async (ctx) => {
 
 bot.command('referrals', async (ctx) => {
     const chatId = ctx.chat.id;
-    const referralLink = `https://telegram.me/MTRXAi_Bot/start?ref_${ctx.from.id}`;
+    const referralLink = `https://telegram.me/MTRXAi_Bot?start=ref_${ctx.from.id}`;
     await ctx.reply(`Here is your referral link: ${referralLink}`);
 });
 
