@@ -2,7 +2,7 @@ import { Telegraf } from 'telegraf';
 import { exec } from 'child_process';
 import vm from 'vm';
 
-const AppToken = 'YOUR_TELEGRAM_BOT_TOKEN';
+const AppToken = '7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA';
 const bot = new Telegraf(AppToken);
 
 const MATRIX_START_TEXT = `
