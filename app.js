@@ -58,15 +58,15 @@ bot.command('exec', async (ctx) => {
         let response = "";
 
         if (error) {
-            response += `<b>Error:</b> <code>${error.message}</code>\n`;
+            response += `<b>ERROR :</b> <code>${error.message}</code>\n`;
         }
 
         if (stderr) {
-            response += `<b>stderr:</b> <code>${stderr.trim()}</code>\n`;
+            response += `<b>STDERR :</b> <code>${stderr.trim()}</code>\n`;
         }
 
         if (stdout) {
-            response += `<b>stdout:</b> <code>${stdout.trim()}</code>\n`;
+            response += `<b>STDOUT :</b> <code>${stdout.trim()}</code>\n`;
         }
 
         if (!response) {
