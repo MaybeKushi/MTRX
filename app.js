@@ -40,7 +40,7 @@ bot.command('eval', async (ctx) => {
         `);
 
         const result = await asyncEval(ctx);
-        await ctx.reply(`**EVAL**: \`${command}\`\n\n**OUTPUT**:\n\`${JSON.stringify(result)}\``, { parse_mode: 'Markdown' });
+        await ctx.reply(`<b>EVAL :</b> <pre>${command}</pre>\n\n<b>OUTPUT :</b>\n<pre>${JSON.stringify(result)}</pre>`, { parse_mode: 'HTML' });
     } catch (err) {
         console.error(err);
         await ctx.reply(`Error:\n\`${err.message}\``);
