@@ -1,7 +1,8 @@
 import { Telegraf } from 'telegraf';
 import { exec } from 'child_process';
+import vm from 'vm';
 
-const AppToken = '7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA';
+const AppToken = 'YOUR_TELEGRAM_BOT_TOKEN';
 const bot = new Telegraf(AppToken);
 
 const MATRIX_START_TEXT = `
@@ -24,7 +25,6 @@ async function getUsername(userId) {
 }
 
 bot.command('eval', async (ctx) => {
-    const userId = ctx.from.id;
     const command = ctx.message.text.split(' ').slice(1).join(' ');
 
     if (!command) {
@@ -32,10 +32,18 @@ bot.command('eval', async (ctx) => {
         return;
     }
 
-    try {
-        const result = eval(command);
-        const evaluation = result || "Success";
+    const sandbox = {
+        console: console,
+        require: require,
+        ctx,
+    };
 
+    try {
+        const script = new vm.Script(command);
+        const context = vm.createContext(sandbox);
+        const result = await script.runInContext(context);
+
+        const evaluation = result || "Success";
         await ctx.reply(`**EVAL**: \`${command}\`\n\n**OUTPUT**:\n\`${evaluation}\``, { parse_mode: 'Markdown' });
     } catch (err) {
         console.error(err);
@@ -44,7 +52,6 @@ bot.command('eval', async (ctx) => {
 });
 
 bot.command('exec', async (ctx) => {
-    const chatId = ctx.chat.id;
     const command = ctx.message.text.split(' ').slice(1).join(' ');
 
     if (!command) {
@@ -75,7 +82,7 @@ bot.command('exec', async (ctx) => {
 
         if (processingMessage && processingMessage.message_id) {
             try {
-                bot.telegram.editMessageText(chatId, processingMessage.message_id, null, response, {
+                bot.telegram.editMessageText(ctx.chat.id, processingMessage.message_id, null, response, {
                     parse_mode: 'HTML'
                 });
             } catch (editError) {
