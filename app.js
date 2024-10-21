@@ -1,5 +1,5 @@
-const { Telegraf } = require('telegraf');
-const { exec } = require('child_process');
+import { Telegraf } from 'telegraf';
+import { exec } from 'child_process';
 
 const AppToken = '7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA';
 const bot = new Telegraf(AppToken);
