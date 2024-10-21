@@ -23,9 +23,28 @@ async function getUsername(userId) {
     }
 }
 
+bot.command('eval', async (ctx) => {
+    const userId = ctx.from.id;
+    const command = ctx.message.text.split(' ').slice(1).join(' ');
+
+    if (!command) {
+        await ctx.reply('Please provide code to execute!');
+        return;
+    }
+
+    try {
+        const result = eval(command);
+        const evaluation = result || "Success";
+
+        await ctx.reply(`**EVAL**: \`${command}\`\n\n**OUTPUT**:\n\`${evaluation}\``, { parse_mode: 'Markdown' });
+    } catch (err) {
+        console.error(err);
+        await ctx.reply(`Error:\n\`${err.message}\``);
+    }
+});
+
 bot.command('exec', async (ctx) => {
     const chatId = ctx.chat.id;
-    const userId = ctx.from.id;
     const command = ctx.message.text.split(' ').slice(1).join(' ');
 
     if (!command) {
@@ -107,20 +126,8 @@ bot.command('start', async (ctx) => {
 });
 
 bot.command('referrals', async (ctx) => {
-    const chatId = ctx.chat.id;
     const referralLink = `https://telegram.me/MTRXAi_Bot?start=ref_${ctx.from.id}`;
     await ctx.reply(`Here is your referral link: ${referralLink}`);
-});
-
-bot.command('id', async (ctx) => {
-    if (ctx.reply_to_message) {
-        const repliedUserId = ctx.reply_to_message.from.id;
-        const repliedUserName = ctx.reply_to_message.from.first_name || "User";
-        await ctx.reply(`${repliedUserName}'s ID: ${repliedUserId}`);
-    } else {
-        const userId = ctx.from.id;
-        await ctx.reply(`${ctx.from.first_name}'s ID: ${userId}`);
-    }
 });
 
 bot.launch();
