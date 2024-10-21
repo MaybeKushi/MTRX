@@ -34,7 +34,6 @@ bot.command('eval', async (ctx) => {
 
     const sandbox = {
         console: console,
-        require: require,
         ctx,
     };
 
