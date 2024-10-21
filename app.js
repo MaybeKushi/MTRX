@@ -32,18 +32,15 @@ bot.command('eval', async (ctx) => {
         return;
     }
 
-    const sandbox = {
-        console: console,
-        ctx,
-    };
-
     try {
-        const script = new vm.Script(command);
-        const context = vm.createContext(sandbox);
-        const result = await script.runInContext(context);
+        const asyncEval = new Function('ctx', `
+            return (async () => {
+                ${command}
+            })();
+        `);
 
-        const evaluation = result || "Success";
-        await ctx.reply(`**EVAL**: \`${command}\`\n\n**OUTPUT**:\n\`${evaluation}\``, { parse_mode: 'Markdown' });
+        const result = await asyncEval(ctx);
+        await ctx.reply(`**EVAL**: \`${command}\`\n\n**OUTPUT**:\n\`${JSON.stringify(result)}\``, { parse_mode: 'Markdown' });
     } catch (err) {
         console.error(err);
         await ctx.reply(`Error:\n\`${err.message}\``);
