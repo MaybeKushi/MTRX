@@ -1,9 +1,10 @@
 import { Telegraf } from 'telegraf';
 import { exec } from 'child_process';
-import vm from 'vm';
+import Datastore from 'nedb';
 
 const AppToken = '7646877814:AAFx-LjNMqIqzLs-30pTwM_vVrV0w5DHDLA';
 const bot = new Telegraf(AppToken);
+const db = new Datastore({ filename: 'users.db', autoload: true });
 
 const MATRIX_START_TEXT = `
 Want to know how cool your Telegram presence is? 
@@ -22,6 +23,28 @@ async function getUsername(userId) {
     } catch (error) {
         return "Unknown"; 
     }
+}
+
+async function findOrCreateUser(userId, inviterId) {
+    return new Promise((resolve, reject) => {
+        db.findOne({ userId: userId }, async (err, user) => {
+            if (err) {
+                reject(err);
+            } else if (user) {
+                resolve(user);
+            } else {
+                // Create a new user entry
+                const newUser = { userId: userId, inviterId: inviterId || null };
+                db.insert(newUser, (insertErr, newDoc) => {
+                    if (insertErr) {
+                        reject(insertErr);
+                    } else {
+                        resolve(newDoc);
+                    }
+                });
+            }
+        });
+    });
 }
 
 bot.command('eval', async (ctx) => {
@@ -101,24 +124,40 @@ bot.command('start', async (ctx) => {
         inline_keyboard: [
             [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?userId=${userId}` } }],
             [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }],
-            [{ text: "Share Link 📤", url: shareLink }]  // Added Share Link button
+            [{ text: "Share Link 📤", url: shareLink }]
         ]
     };
 
+    // Handle the invite link
     if (commandArgs && commandArgs.startsWith('ref_')) {
         const inviterId = commandArgs.split('ref_')[1];
-        const inviterName = await getUsername(inviterId);
-        const messageText = `${MATRIX_START_TEXT}\nInvited by: ${inviterName}`;
+        
+        // Check if inviter exists
+        db.findOne({ userId: inviterId }, async (err, inviter) => {
+            if (err || !inviter) {
+                await ctx.reply('Invalid referral link. Please use a valid link.');
+                return;
+            }
 
-        await ctx.telegram.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
-            caption: messageText,
-            reply_markup: inlineKeyboard
+            // Create or update the user
+            await findOrCreateUser(userId, inviterId);
+            const inviterName = await getUsername(inviterId);
+            const messageText = `${MATRIX_START_TEXT}\nInvited by: ${inviterName}`;
+
+            await ctx.telegram.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
+                caption: messageText,
+                reply_markup: inlineKeyboard
+            });
+
+            await ctx.telegram.sendMessage(inviterId, `${ctx.from.username || ctx.from.first_name} Joined via your invite link!`);
         });
-
-        await ctx.telegram.sendMessage(inviterId, `${ctx.from.username || ctx.from.first_name} Joined via your invite link!`);
     } else {
+        // No invite link; just greet the user
+        const user = await findOrCreateUser(userId);
+        const invitedBy = user.inviterId ? `Invited by: ${await getUsername(user.inviterId)}` : '';
+
         await ctx.telegram.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
-            caption: MATRIX_START_TEXT,
+            caption: `${MATRIX_START_TEXT}\n${invitedBy}`,
             reply_markup: inlineKeyboard
         });
     }
@@ -127,6 +166,17 @@ bot.command('start', async (ctx) => {
 bot.command('referrals', async (ctx) => {
     const referralLink = `https://telegram.me/MTRXAi_Bot?start=ref_${ctx.from.id}`;
     await ctx.reply(`Here is your referral link: ${referralLink}`);
+});
+
+bot.command('myinvites', async (ctx) => {
+    db.find({ inviterId: ctx.from.id }, async (err, users) => {
+        if (err || users.length === 0) {
+            await ctx.reply('You have no invites.');
+        } else {
+            const invitesList = users.map(user => `User ID: ${user.userId}`).join('\n');
+            await ctx.reply(`Your invites:\n${invitesList}`);
+        }
+    });
 });
 
 bot.launch();
