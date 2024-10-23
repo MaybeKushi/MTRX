@@ -95,17 +95,20 @@ bot.command('start', async (ctx) => {
     const userId = ctx.from.id;
     const commandArgs = ctx.message.text.split(' ')[1];
 
+    const shareLink = `https://telegram.me/share/url?url=Join%20the%20Matrix%20AI%20journey%20with%20me%20%21%20Dive%20into%20the%20future%20of%20crypto%20and%20AI%2C%20and%20start%20earning%20today.%20Use%20my%20link%20and%20be%20part%20of%20the%20revolution%20%21%0A%0AJoin%20Now%20%3A%20https%3A//telegram.me/MTRXAi_Bot/%3Fstart%3Dref_${userId}`;
+
+    const inlineKeyboard = {
+        inline_keyboard: [
+            [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?userId=${userId}` } }],
+            [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }],
+            [{ text: "Share Link 📤", url: shareLink }]  // Added Share Link button
+        ]
+    };
+
     if (commandArgs && commandArgs.startsWith('ref_')) {
         const inviterId = commandArgs.split('ref_')[1];
         const inviterName = await getUsername(inviterId);
-
         const messageText = `${MATRIX_START_TEXT}\nInvited by: ${inviterName}`;
-        const inlineKeyboard = {
-            inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?userId=${userId}&inviterId=${inviterId}` } }],
-                [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
-            ]
-        };
 
         await ctx.telegram.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
             caption: messageText,
@@ -114,13 +117,6 @@ bot.command('start', async (ctx) => {
 
         await ctx.telegram.sendMessage(inviterId, `${ctx.from.username || ctx.from.first_name} Joined via your invite link!`);
     } else {
-        const inlineKeyboard = {
-            inline_keyboard: [
-                [{ text: "Play Now 🪂", web_app: { url: `https://mtx-ai-bot.vercel.app/?userId=${userId}` } }],
-                [{ text: "Join Community 🔥", url: "https://telegram.me/MatrixAi_Ann" }]
-            ]
-        };
-
         await ctx.telegram.sendPhoto(chatId, "https://i.ibb.co/XDPzBWc/pngtree-virtual-panel-generate-ai-image-15868619.jpg", {
             caption: MATRIX_START_TEXT,
             reply_markup: inlineKeyboard
